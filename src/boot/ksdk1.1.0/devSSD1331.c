@@ -60,6 +60,8 @@ writeCommand(uint8_t commandByte)
 }
 
 
+void writeNumber(uint16_t num);
+
 
 int
 devSSD1331init(void)
@@ -158,6 +160,210 @@ devSSD1331init(void)
 	//...
 
 
+	/*
+	 *	Fill screen with green
+	 */
+
+	/*
+	SEGGER_RTT_printf(0,"Green Color -----------------------\n");
+	*/
+	writeCommand(kSSD1331CommandDRAWRECT);
+        writeCommand(0x00);
+        writeCommand(0x00);
+        writeCommand(0x5F);
+        writeCommand(0x3F);
+	writeCommand(0x00);	// line color C
+	writeCommand(0xFF);	// line color B
+	writeCommand(0x00);	// line color A
+	writeCommand(0x00);	// fill color C
+	writeCommand(0xFF);	// fill color B
+	writeCommand(0x00);	// fill color A
+	
+	writeNumber(1234);
 
 	return 0;
+}
+
+void drawLine(uint8_t col_start, uint8_t row_start, uint8_t col_end, uint8_t row_end, uint8_t R, uint8_t G, uint8_t B) {
+    writeCommand(kSSD1331CommandDRAWLINE);
+    writeCommand(col_start);	// Column Address of Start
+    writeCommand(row_start);	// Row Address of Start
+    writeCommand(col_end);	// Column Address of End
+    writeCommand(row_end);	// Row Address of End
+    writeCommand(B);     // Color C of the line
+    writeCommand(G);     // Color B of the line
+    writeCommand(B);     // Color A of the line
+    return;
+}
+void drawRectangle(uint8_t col_start, uint8_t row_start, uint8_t col_end, uint8_t row_end, uint8_t R, uint8_t G, uint8_t B) {
+    writeCommand(kSSD1331CommandDRAWRECT);
+    writeCommand(col_start);	// Column Address of Start
+    writeCommand(row_start);	// Row Address of Start
+    writeCommand(col_end);	// Column Address of End
+    writeCommand(row_end);	// Row Address of End
+    writeCommand(B);     // Color C of the line
+    writeCommand(G);     // Color B of the line
+    writeCommand(R);     // Color A of the line
+    writeCommand(B);     // Color C of the fill area
+    writeCommand(G);     // Color B of the fill area
+    writeCommand(R);     // Color A of the fill area
+    return;
+}
+
+void drawZero(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x, row_y, col_x, row_y+20, R, G, B); // long left v line
+    drawLine(col_x+10, row_y, col_x+10, row_y+20, R, G, B); // long right v line
+    return;
+}
+void drawOne(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x+5, row_y, col_x+5, row_y+20, R, G, B); // v line
+    return;
+}
+void drawTwo(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x, row_y+10, col_x, row_y+20, R, G, B); // lower left v line
+    drawLine(col_x+10, row_y, col_x+10, row_y+10, R, G, B); // upper right v line
+    return;
+}
+void drawThree(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x+10, row_y, col_x+10, row_y+20, R, G, B); // long right v line
+    return;
+}
+void drawFour(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y, col_x, row_y+10, R, G, B); // left v line
+    drawLine(col_x+10, row_y, col_x+10, row_y+20, R, G, B); // long right v line
+    drawLine(col_x, row_y, col_x, row_y+10, R, G, B); // upper left v line
+    return;
+}
+void drawFive(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x, row_y, col_x, row_y+10, R, G, B); // upper left v line
+    drawLine(col_x+10, row_y+10, col_x+10, row_y+20, R, G, B); // lower right v line
+    return;
+}
+void drawSix(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x, row_y, col_x, row_y+20, R, G, B); // long left v line
+    drawLine(col_x+10, row_y+10, col_x+10, row_y+20, R, G, B); // lower right v line
+    return;
+}
+void drawSeven(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x+10, row_y, col_x+10, row_y+20, R, G, B); // long right v line
+    return;
+}
+void drawEight(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x, row_y, col_x, row_y+20, R, G, B); // long left v line
+    drawLine(col_x+10, row_y, col_x+10, row_y+20, R, G, B); // long right v line
+    return;
+}
+void drawNine(uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    drawLine(col_x, row_y, col_x+10, row_y, R, G, B); // upper h line
+    drawLine(col_x, row_y+10, col_x+10, row_y+10, R, G, B); // centre h line
+    drawLine(col_x, row_y+20, col_x+10, row_y+20, R, G, B); // lower h line
+    drawLine(col_x, row_y, col_x, row_y+10, R, G, B); // upper left v line
+    drawLine(col_x+10, row_y, col_x+10, row_y+20, R, G, B); // long right v line
+    return;
+}
+
+void writeCharacter(uint8_t character, uint8_t col_x, uint8_t row_y, uint8_t R, uint8_t G, uint8_t B) {
+    switch(character) {
+        case 0: {
+            drawZero(col_x, row_y, R, G, B);
+            break;
+        }
+        case 1: {
+            drawOne(col_x, row_y, R, G, B);
+            break;
+        }
+        case 2: {
+            drawTwo(col_x, row_y, R, G, B);
+            break;
+        }
+        case 3: {
+            drawThree(col_x, row_y, R, G, B);
+            break;
+        }
+        case 4: {
+            drawFour(col_x, row_y, R, G, B);
+            break;
+        }
+        case 5: {
+            drawFive(col_x, row_y, R, G, B);
+            break;
+        }
+        case 6: {
+            drawSix(col_x, row_y, R, G, B);
+            break;
+        }
+        case 7: {
+            drawSeven(col_x, row_y, R, G, B);
+            break;
+        }
+        case 8: {
+            drawEight(col_x, row_y, R, G, B);
+            break;
+        }
+        case 9: {
+            drawNine(col_x, row_y, R, G, B);
+            break;
+        }
+    }
+    return;
+}
+
+void writeNumber(uint16_t num) {
+    uint8_t R = 0;
+    uint8_t G = 255;
+    uint8_t B = 0;
+    
+    if(num < 500) {
+        R = 255;
+        G = 255;
+        B = 0;
+    }
+    if(num < 200) {
+        R = 255;
+        G = 0;
+        B = 0;
+    }
+
+    drawRectangle(0, 0, 95, 63, B, G, R);
+
+    R = 255;
+    G = 255;
+    B = 255;
+
+    uint8_t thousand = num/1000;
+    num -= thousand*1000;
+    uint8_t hundred = num/100;
+    num -= hundred*100;
+    uint8_t ten = num/10;
+    num -= ten*10;
+    uint8_t one = num;
+
+    uint8_t col_x0 = 20; // x
+    uint8_t row_y0 = 22; // y
+
+    writeCharacter(thousand, col_x0, row_y0, R, G, B);
+    writeCharacter(hundred, col_x0+14, row_y0, R, G, B);
+    writeCharacter(ten, col_x0+28, row_y0, R, G, B);
+    writeCharacter(one, col_x0+42, row_y0, R, G, B);
+
+    return;
 }

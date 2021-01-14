@@ -57,7 +57,7 @@
 
 
 #define WARP_FRDMKL03
-
+#include "devSSD1331.h"
 
 /*
 *	Comment out the header file to disable devices
@@ -84,13 +84,8 @@
 //#include "devISL23415.h"
 #else
 #	include "devMMA8451Q.h"
-/*
- *	Add devSSD1331.h
- */
 #endif
-
-#	include "devSSD1331.h"
-
+#define WARP_BUILD_ENABLE_INA219
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
 //#define WARP_BUILD_BOOT_TO_CSVSTREAM
 
@@ -1357,118 +1352,8 @@ main(void)
 	 *	Notreached
 	 */
 #endif
-
-/**************************************************************    INA219   ***********************************************************************/
-	
-/*	enableI2Cpins(menuI2cPullupValue);
-
-	extern volatile uint32_t	gWarpI2cBaudRateKbps;
-	extern volatile uint32_t	gWarpI2cTimeoutMilliseconds;
-	extern volatile uint32_t	gWarpSupplySettlingDelayMilliseconds;
-	
-	
-	uint16_t ICONFIG_BVOLTAGERANGE_16V =        (0x0000);  // 0-16V Range
-	uint16_t ICONFIG_GAIN_1_40MV        =       (0x0000);  // Gain 1, 40mV Range
-	uint16_t ICONFIG_BADCRES_12BIT       =      (0x0180);  // 12-bit bus res = 0..4097
-	uint16_t ICONFIG_SADCRES_12BIT_128S_69MS =  (0x0078);  // 128 x 12-bit shunt samples averaged together
-	uint16_t ICONFIG_MODE_SANDBVOLT_CONTINUOUS = (0x0007);
-	
-	uint8_t INA219_DEVICE_ADDR = (0x40);	
-	uint8_t INA219_CONFIG_REG = (0x00);
-	uint8_t INA219_CALIB_REG = (0x05);
-	uint8_t INA219_CURRENT_REG = (0x04);
-	
-	uint16_t calValue = 8192;	
-	uint8_t currentDivider_mA = 20;
-
-	uint16_t config = ICONFIG_BVOLTAGERANGE_16V |
-                          ICONFIG_GAIN_1_40MV |
-                          ICONFIG_BADCRES_12BIT |
-                          ICONFIG_SADCRES_12BIT_128S_69MS |
-                          ICONFIG_MODE_SANDBVOLT_CONTINUOUS;
-	
-	config = 0b10001000111;*/
-	/*
-	 *	Current_LSB = 0.00001 A (10 microAmps)
-	 *	calValue = 40960
-	 *	multiply current register by 1í to get actual current in microAmps
-	 */
-/*	calValue = 40960;
-	currentDivider_mA = 10;
-*/	
-        /*
-        uint8_t         cmdBuf[1] = {0xFF};
-        uint8_t         payloadBuf[2];
-        i2c_status_t    status;
-        
-        i2c_device_t slave =
-        {
-          .address = INA219_DEVICE_ADDR,
-          .baudRate_kbps = gWarpI2cBaudRateKbps
-        };
-        
-        cmdBuf[0] = INA219_CONFIG_REG;
-                                                       
-        status = I2C_DRV_MasterReceiveDataBlocking(
-                                                  0 ,
-                                                  &slave,
-                                                  cmdBuf,
-                                                  1,
-                                                  (uint8_t *) payloadBuf,
-                                                  2,
-                                                  gWarpI2cTimeoutMilliseconds);
-         uint16_t readSensorRegisterValueCombined = ((payloadBuf[0] << 8) | (payloadBuf[1] & 0xFF));
-         readSensorRegisterValueCombined *= currentDivider_mA;
-         SEGGER_RTT_printf(0, "\n %d,", readSensorRegisterValueCombined);
- 	*/
-
-
-
-
-
-
-		
-	// Write Configuration Register
-/*	uint8_t         payloadByte[2];
-	uint8_t         commandByte[1];
-	i2c_status_t    status;
-	
-	i2c_device_t slave =
-        {
-                 .address = INA219_DEVICE_ADDR,
-                 .baudRate_kbps = gWarpI2cBaudRateKbps
-        };
- 
-        commandByte[0] = INA219_CONFIG_REG;
-        payloadByte[0] = (uint8_t)((config>>8) & 0xFF);
-        payloadByte[1] = (uint8_t)(config & 0xFF);
-        status = I2C_DRV_MasterSendDataBlocking(
-                                                        0 ,
-                                                        &slave,
-                                                        commandByte,
-                                                        1,
-                                                        payloadByte,
-                                                        2,
-                                                        gWarpI2cTimeoutMilliseconds);
-*/	
-
-
-	/*
-	volatile WarpI2CDeviceState	deviceINA219State;
-	initINA219(0x40, &deviceINA219State);
-	setCalibration_16V_400mA(menuI2cPullupValue);
-	*/
-
-/**************************************************************************************************************************************************/
-
-// Invite function to initialise display devSSD1331
-
-	devSSD1331init();
-
-
 	while (1)
 	{
-#if 1
 		/*
 		 *	Do not, e.g., lowPowerPinStates() on each iteration, because we actually
 		 *	want to use menu to progressiveley change the machine state with various
@@ -1576,22 +1461,18 @@ main(void)
 		SEGGER_RTT_WriteString(0, "\r- 'z': dump all sensors data.\n");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
 
-
-		/***************************************   INA219   *******************************************/
-		SEGGER_RTT_WriteString(0, "\r- '0': take measurements with INA219.\n");
-		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds); 
-		/**********************************************************************************************/
-
-		/**************************************   VL53L0X   *******************************************/
-		SEGGER_RTT_WriteString(0, "\r- '1': take one measurement with VL53L0X and print debug info.\n");
+		SEGGER_RTT_WriteString(0, "\rEnter selection> ");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
 		
-		SEGGER_RTT_WriteString(0, "\r- '2': take a series of measurements with VL53L0X and display distance.\n");
+#ifdef WARP_BUILD_ENABLE_INA219
+		SEGGER_RTT_WriteString(0, "\r- '1': Coursework 4 current read sequence\n");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
-		/**********************************************************************************************/
+#endif
 
 		SEGGER_RTT_WriteString(0, "\rEnter selection> ");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+
+		
 		key = SEGGER_RTT_WaitKey();
 		
 		switch (key)
@@ -1599,372 +1480,6 @@ main(void)
 			/*
 			 *		Select sensor
 			 */
-			case '0':
-			{
-			        	
-				enableI2Cpins(menuI2cPullupValue);
-
-				extern volatile uint32_t	gWarpI2cBaudRateKbps;
-				extern volatile uint32_t	gWarpI2cTimeoutMilliseconds;
-				extern volatile uint32_t	gWarpSupplySettlingDelayMilliseconds;
-
-				uint8_t INA219_DEVICE_ADDR = (0x40);	
-				uint8_t INA219_CONFIG_REG = (0x00);
-				uint8_t INA219_CALIB_REG = (0x05);
-				uint8_t INA219_CURRENT_REG = (0x04);
-				
-				/*
-				current_LSB = 0.00001 A (10 microAmps)
-				rshunt = 0.1 Ohm
-				calValue = trunc(0.04096 / (current_LSB * rshunt))
-
-				current in microAmps = reading * 10
-				*/		
-				
-				uint16_t calValue = 40960;	
-				uint8_t currentMultiplier = 10; // to microAmps
-				
-				/*
-				bit 13 to 0: 16V operating range
-				bit 10 to 1: Bus ADC 12 bit resolution
-				bit  6 to 1: Shunt ADC 12 bit resolution
-				bits 0-2 to 1: Bus and shunt contiuous mode
-				*/
-				uint16_t config =  0b10001000111;
-
-				// Write Configuration Register
-				uint8_t         payloadByte[2];
-				uint8_t         commandByte[1];
-				i2c_status_t    status;
-	
-				i2c_device_t slave =
-			        {
-			                 .address = INA219_DEVICE_ADDR,
-			                 .baudRate_kbps = gWarpI2cBaudRateKbps
-			        };
-
-
-
-
- 
-			        commandByte[0] = INA219_CONFIG_REG;
-			        payloadByte[0] = (uint8_t)((config>>8) & 0xFF);
-			        payloadByte[1] = (uint8_t)(config & 0xFF);
-			        status = I2C_DRV_MasterSendDataBlocking(
-			                                                        0 ,
-			                                                        &slave,
-			                                                        commandByte,
-			                                                        1,
-			                                                        payloadByte,
-			                                                        2,
-			                                                        gWarpI2cTimeoutMilliseconds);
-	
-
-				SEGGER_RTT_printf(0,"\nConfiguration Successful,");
-
-				// Write Calibration Register
-			        commandByte[0] = INA219_CALIB_REG;
-			        payloadByte[0] = (uint8_t)((calValue>>8) & 0xFF);
-			        payloadByte[1] = (uint8_t)(calValue & 0xFF);
-			        status = I2C_DRV_MasterSendDataBlocking(
-			                                                        0 ,
-			                                                        &slave,
-			                                                        commandByte,
-			                                                        1,
-			                                                        payloadByte,
-			                                                        2,
-			                                                        gWarpI2cTimeoutMilliseconds);
-
-
-				SEGGER_RTT_printf(0,"\nCalibration Successful,");
-
-
-				// Read 1000 times from the Current Register
-				uint8_t         cmdBuf[1] = {0xFF};
-				uint8_t		payloadBuf[2];
- 
-				cmdBuf[0] = INA219_CURRENT_REG;
-
-
-				for(int i = 0; i < 1000; i++)
-				{
-					
-					status = I2C_DRV_MasterReceiveDataBlocking(
-											0 ,
-											&slave,
-											cmdBuf,
-											1,
-											payloadBuf,
-											2,
-											gWarpI2cTimeoutMilliseconds);
-					uint16_t readSensorRegisterValueCombined = ((payloadBuf[0] << 8) | (payloadBuf[1] & 0xFF));
-					readSensorRegisterValueCombined *= currentMultiplier;
-
-					SEGGER_RTT_printf(0, "\n%d,", currentMultiplier*(payloadBuf[0]<<8  | payloadBuf[1]));
-					payloadBuf[0] = 0;
-					payloadBuf[1] = 1;
-
-				}
-	
-				break;
-			}
-			case '1':
-			{
-			        	
-				enableI2Cpins(menuI2cPullupValue);
-
-				extern volatile uint32_t	gWarpI2cBaudRateKbps;
-				extern volatile uint32_t	gWarpI2cTimeoutMilliseconds;
-				extern volatile uint32_t	gWarpSupplySettlingDelayMilliseconds;
-
-				uint8_t VL53L0X_DEVICE_ADDR                         = (0x29);	
-				uint8_t VL53L0X_REG_IDENTIFICATION_MODEL_ID         = (0xc0);
-                		uint8_t VL53L0X_REG_IDENTIFICATION_REVISION_ID      = (0xc2);
-                		uint8_t VL53L0X_REG_PRE_RANGE_CONFIG_VCSEL_PERIOD   = (0x50);
-                		uint8_t VL53L0X_REG_FINAL_RANGE_CONFIG_VCSEL_PERIOD = (0x70);
-                		uint8_t VL53L0X_REG_SYSRANGE_START                  = (0x00);
-                		uint8_t VL53L0X_REG_RESULT_INTERRUPT_STATUS         = (0x13);
-                		uint8_t VL53L0X_REG_RESULT_RANGE_STATUS             = (0x14);
-
-				i2c_status_t    status;
-	
-				i2c_device_t slave =
-			        {
-			                 .address = VL53L0X_DEVICE_ADDR,
-			                 .baudRate_kbps = gWarpI2cBaudRateKbps
-			        };
-
-
-                		SEGGER_RTT_printf(0,"\nStarting measurements,");
-
-                		// Reading Revision ID
-
-                		uint8_t         cmdBuf[1] = {0xFF};
-				uint8_t		payloadBuf[1];
- 
-				cmdBuf[0] = VL53L0X_REG_IDENTIFICATION_REVISION_ID;
-					
-                		status = I2C_DRV_MasterReceiveDataBlocking(
-                                        0 ,
-                                        &slave,
-                                        cmdBuf,
-                                        1,
-                                        payloadBuf,
-                                        1,
-                                        gWarpI2cTimeoutMilliseconds);
-                
-                		SEGGER_RTT_printf(0, "\nRevision ID: %d,", payloadBuf[0]);
-                		payloadBuf[0] = 0;
-
-                		// Reading Device ID
- 
-				cmdBuf[0] = VL53L0X_REG_IDENTIFICATION_MODEL_ID;
-					
-                		status = I2C_DRV_MasterReceiveDataBlocking(
-                                        0 ,
-                                        &slave,
-                                        cmdBuf,
-                                        1,
-                                        payloadBuf,
-                                        1,
-                                        gWarpI2cTimeoutMilliseconds);
-                
-                		SEGGER_RTT_printf(0, "\nDevice ID: %d,", payloadBuf[0]);
-                		payloadBuf[0] = 0;
-
-				// Write Sys Range Start register to start measurements
-			        cmdBuf[0] = VL53L0X_REG_SYSRANGE_START;
-			        payloadBuf[0] = 0x01;
-			        status = I2C_DRV_MasterSendDataBlocking(
-			                                                        0 ,
-			                                                        &slave,
-			                                                        cmdBuf,
-			                                                        1,
-			                                                        payloadBuf,
-			                                                        1,
-			                                                        gWarpI2cTimeoutMilliseconds);
-                		payloadBuf[0] = 0;
-
-                		// Reading Results
-                
-                		cmdBuf[0] = VL53L0X_REG_RESULT_RANGE_STATUS;
-
-                		int cnt = 0;
-
-                		while (cnt < 100)
-				{ // 1 second waiting time max
-                    			OSA_TimeDelay(10);
-
-                    			status = I2C_DRV_MasterReceiveDataBlocking(
-                                        	0 ,
-                                        	&slave,
-                                        	cmdBuf,
-                                        	1,
-                                        	payloadBuf,
-                                        	1,
-                                        	gWarpI2cTimeoutMilliseconds);
-
-                    
-                    			if (payloadBuf[0] & 0x01)
-                    			{
-                    			    break;
-                    			}
-                    			cnt++;
-                		}
-
-                		if (payloadBuf[0] & 0x01)
-                		{
-                		    SEGGER_RTT_printf(0,"\nDevice ready,");
-                		}
-                		else
-                		{
-                		    SEGGER_RTT_printf(0,"\nDevice not ready,");
-                		}
-
-                		uint8_t		payloadBuf_l[12];
-
-                		status = I2C_DRV_MasterReceiveDataBlocking(
-                                        0 ,
-                                        &slave,
-                                        cmdBuf,
-                                        1,
-                                        payloadBuf_l,
-                                        12,
-                                        gWarpI2cTimeoutMilliseconds);
-
-                		uint16_t acnt = ((payloadBuf_l[6] & 0xFF) << 8) | (payloadBuf_l[7] & 0xFF);
-                		uint16_t scnt = ((payloadBuf_l[8] & 0xFF) << 8) | (payloadBuf_l[9] & 0xFF);
-                		uint16_t dist = ((payloadBuf_l[10] & 0xFF) << 8) | (payloadBuf_l[11] & 0xFF);
-                		uint8_t DeviceRangeStatusInternal = ((payloadBuf_l[0] & 0x78) >> 3);
-
-                		SEGGER_RTT_printf(0, "\nAmbient count: %d,", acnt);
-                		SEGGER_RTT_printf(0, "\nSignal count: %d,", scnt);
-                		SEGGER_RTT_printf(0, "\nDistance: %d,", dist);
-                		SEGGER_RTT_printf(0, "\nStatus: %d,", DeviceRangeStatusInternal);
-
-                		SEGGER_RTT_printf(0,"\nMeasurements finished,");
-
-
-                		break;
-				
-			}
-			case '2':
-			{
-			        	
-				enableI2Cpins(menuI2cPullupValue);
-
-				extern volatile uint32_t	gWarpI2cBaudRateKbps;
-				extern volatile uint32_t	gWarpI2cTimeoutMilliseconds;
-				extern volatile uint32_t	gWarpSupplySettlingDelayMilliseconds;
-
-				uint8_t VL53L0X_DEVICE_ADDR                         = (0x29);	
-				uint8_t VL53L0X_REG_IDENTIFICATION_MODEL_ID         = (0xc0);
-                		uint8_t VL53L0X_REG_IDENTIFICATION_REVISION_ID      = (0xc2);
-                		uint8_t VL53L0X_REG_PRE_RANGE_CONFIG_VCSEL_PERIOD   = (0x50);
-                		uint8_t VL53L0X_REG_FINAL_RANGE_CONFIG_VCSEL_PERIOD = (0x70);
-                		uint8_t VL53L0X_REG_SYSRANGE_START                  = (0x00);
-                		uint8_t VL53L0X_REG_RESULT_INTERRUPT_STATUS         = (0x13);
-                		uint8_t VL53L0X_REG_RESULT_RANGE_STATUS             = (0x14);
-
-
-				// Initialize I2C device
-				i2c_status_t    status;
-	
-				i2c_device_t slave =
-			        {
-			                 .address = VL53L0X_DEVICE_ADDR,
-			                 .baudRate_kbps = gWarpI2cBaudRateKbps
-			        };
-
-
-                		SEGGER_RTT_printf(0,"\nStarting measurements");
-
-                		uint8_t         cmdBuf[1] = {0xFF};
-				uint8_t		payloadBuf[1];
- 
-                		// Reading Results for 30 seconds
-                
-                		int cnt = 0;
-
-                		uint8_t	payloadBuf_l[12];
-				uint16_t dist = 0;
-
-				uint32_t startTime = OSA_TimeGetMsec()/1000;
-
-				while((OSA_TimeGetMsec()/1000 - startTime) < 30) {
-					SEGGER_RTT_printf(0, "\nTime elapsed: %d s", (OSA_TimeGetMsec()/1000 - startTime));
-
-					// Write Sys Range Start register to start measurements
-			        	cmdBuf[0] = VL53L0X_REG_SYSRANGE_START;
-			        	payloadBuf[0] = 0x01;
-			        	status = I2C_DRV_MasterSendDataBlocking(
-			        	                                                0 ,
-			        	                                                &slave,
-			        	                                                cmdBuf,
-			        	                                                1,
-			        	                                                payloadBuf,
-			        	                                                1,
-			        	                                                gWarpI2cTimeoutMilliseconds);
-                			payloadBuf[0] = 0;
-				
-                			cmdBuf[0] = VL53L0X_REG_RESULT_RANGE_STATUS;
-					// See if sensor is ready to read out distance
-					cnt = 0;	
-					while (cnt < 100)
-					{ // 1 second waiting time max
-                    			OSA_TimeDelay(10);
-
-                    			status = I2C_DRV_MasterReceiveDataBlocking(
-                                        	0 ,
-                                        	&slave,
-                                        	cmdBuf,
-                                        	1,
-                                        	payloadBuf,
-                                        	1,
-                                        	gWarpI2cTimeoutMilliseconds);
-
-                    
-                    				if (payloadBuf[0] & 0x01)
-                    				{
-                    				    break;
-                    				}
-                    				cnt++;
-					}
-
-					if (payloadBuf[0] & 0x01)
-					{
-					    SEGGER_RTT_printf(0,"\nDevice ready");
-					}
-					else
-					{
-					    SEGGER_RTT_printf(0,"\nDevice not ready");
-					}
-
-					// Read out distance from device register
-                			status = I2C_DRV_MasterReceiveDataBlocking(
-                                        	0 ,
-                                        	&slave,
-                                        	cmdBuf,
-                                        	1,
-                                        	payloadBuf_l,
-                                        	12,
-                                        	gWarpI2cTimeoutMilliseconds);
-
-                			dist = ((payloadBuf_l[10] & 0xFF) << 8) | (payloadBuf_l[11] & 0xFF); // "assemble" actual distance
-
-                			SEGGER_RTT_printf(0, "\nDistance: %d mm", dist);
-
-					writeNumber(dist); // show distance on the OLED display
-					
-                    			OSA_TimeDelay(10);
-				}
-
-                		SEGGER_RTT_printf(0,"\nMeasurements finished");
-
-
-                		break;
-				
-			}
 			case 'a':
 			{
 				SEGGER_RTT_WriteString(0, "\r\tSelect:\n");
@@ -2086,8 +1601,6 @@ main(void)
 
 				SEGGER_RTT_WriteString(0, "\r\tEnter selection> ");
 				OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
-
-				key = SEGGER_RTT_WaitKey();
 
 				switch(key)
 				{
@@ -2974,7 +2487,59 @@ main(void)
 
 				break;
 			}
+			
+			case '1':
+			{
+//turn on screen as in coursework 2					
+		
+				devSSD1331init();
+//initialise i2c 
+		
+				i2c_device_t INA219_slave;
+				INA219_slave.address = 0x40;
+				INA219_slave.baudRate_kbps = gWarpI2cBaudRateKbps;
+				enableI2Cpins(menuI2cPullupValue);
 
+//set cal_value to 40960 - works out to current_LSB being 10 microamps for a 0.1ohm shunt.				
+
+				uint16_t cal_value = 40960;	
+				uint8_t rxBuff[2] = {0x00, 0x00};
+				uint8_t cmdBuff[1] = {0x00};
+				uint8_t txBuff[2] = {0x00, 0x00};
+
+//Config register: clear bit 13 for 16V range, set SADC4 and BADC4 bits to 1 for 12-bit sampling without averaging, and set Mode 1, 2 and 3 bits for shunt and bus cont. readings				
+				cmdBuff[0] = 0x00;
+				txBuff[0] = 0x00 | 1<<2;
+				txBuff[1] = 0b01000111;
+				I2C_DRV_MasterSendDataBlocking(0, &INA219_slave, cmdBuff, 1, txBuff, 2, 100);
+
+//write cal_value to cal register
+
+				cmdBuff[0] = 0x05;
+				txBuff[0] = (cal_value >> 8) & 0xff;
+				txBuff[1] = (cal_value >> 0) & 0xff;
+				I2C_DRV_MasterSendDataBlocking(0, &INA219_slave, cmdBuff, 1, txBuff, 2, 100);
+
+				cmdBuff[0] = 0x04;
+				rxBuff[0] = 0x00;
+				rxBuff[1] = 0x00;
+				
+				SEGGER_RTT_WriteString(0, "\r\nCurrent Readings\r\n");
+
+//print 1000 current readings (must be multiplied by 10 to give reading in microamps)
+				for(int i = 0; i<1000; i++)
+				{
+					uint8_t print_string[20];
+					I2C_DRV_MasterReceiveDataBlocking(0, &INA219_slave, cmdBuff, 1, rxBuff, 2, 100);
+					uint16_t current_raw = rxBuff[0] << 8 | rxBuff[1];
+
+					sprintf(print_string, "%d\r\n", current_raw); 
+					SEGGER_RTT_WriteString(0, print_string);
+					rxBuff[0] = 0x00;
+					rxBuff[1] = 0x00;
+				}				
+				break;
+			}
 
 			/*
 			 *	Ignore naked returns.
@@ -2992,7 +2557,6 @@ main(void)
 				#endif
 			}
 		}
-#endif
 	}
 
 	return 0;
