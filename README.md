@@ -6,7 +6,7 @@ This repository contains the functionalities implemented for the parking assista
 
 The program of the parking assistance device was written in the following files:
 
-1. `src/boot/ksdk1.1.0/warp-kl03-ksdk1.1-boot.c`: Interfacing with the sensor and giving out the command to write the results on the screen. This functionality was implemented in the main switch statement of the Warp menu. Measurements can be initiated from the Warp menu by pressing '1' (single measurement with debug info) or '2' (continous measurement for 30 seconds). The code lies between lines 1711 and 1967.
+1. `src/boot/ksdk1.1.0/warp-kl03-ksdk1.1-boot.c`: Interfacing with the sensor and giving out the command to write the results on the screen. This functionality was implemented in the main switch statement of the Warp menu. Measurements can be initiated from the Warp menu by pressing `1` (single measurement with debug info) or `2` (continous measurement for 30 seconds). The code lies between lines 1711 and 1967.
 
 2. `src/boot/kskd1.1.0/devSSD1331.c`: Interfacing the display and functions to draw the results on the screen.
 
