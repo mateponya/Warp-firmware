@@ -2,13 +2,13 @@
 
 Máté Pónya (mp864), Wolfson College
 
-This repository contains the functionalities implemented for the parking assistance system of coursework 5 (and also contains the code for the previous courseworks). The parking assistance system consists of a time of flight distance measurement sensor, and OLED display and the FRDM KL03 board.
+This repository contains the functionalities implemented for the parking assistance system of coursework 5 (and also contains the code for the previous courseworks). The parking assistance system consists of a time of flight distance measurement sensor, an OLED display and the FRDM KL03 board.
 
 The program of the parking assistance device was written in the following files:
 
-1. 'src/boot/ksdk1.1.0/warp-kl03-ksdk1.1-boot.c': Interfacing with the sensor and giving out the command to write the results on the screen. This funcionality was implemented in the main switch statement of the Warp menu. Measurements can be initiated from the Warp menu by pressing '1' (single measurement with debug info or '2' continous measurement for 30 seconds. The code lies between lines  and .
+1. `src/boot/ksdk1.1.0/warp-kl03-ksdk1.1-boot.c`: Interfacing with the sensor and giving out the command to write the results on the screen. This functionality was implemented in the main switch statement of the Warp menu. Measurements can be initiated from the Warp menu by pressing '1' (single measurement with debug info) or '2' (continous measurement for 30 seconds). The code lies between lines 1711 and 1967.
 
-2. 'src/boot/kskd1.1.0/devSSD1331.c': Interfacing the display and functions to draw the results on the screen.
+2. `src/boot/kskd1.1.0/devSSD1331.c`: Interfacing the display and functions to draw the results on the screen.
 
 
 # Baseline firmware for the [Warp](https://github.com/physical-computation/Warp-hardware) family of hardware platforms
