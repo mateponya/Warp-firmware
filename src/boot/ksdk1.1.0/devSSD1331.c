@@ -179,7 +179,7 @@ devSSD1331init(void)
 	writeCommand(0xFF);	// fill color B
 	writeCommand(0x00);	// fill color A
 	
-	writeNumber(1234);
+	//writeNumber(1234);
 
 	return 0;
 }
