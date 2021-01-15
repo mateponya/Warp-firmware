@@ -10,6 +10,19 @@ The program of the parking assistance device was written in the following files:
 
 2. `src/boot/kskd1.1.0/devSSD1331.c`: Interfacing the display and functions to draw the results on the screen.
 
+Hardware wiring:
+
+| FRDM Board | OLED Display | ToF Sensor |
+|:----------:|:------------:|:----------:|
+|     GND    |      GND     |     GND    |
+|     5V     |      VCC     |     VCC    |
+|    PTB13   |      OCS     |      -     |
+|    PTB0    |      RST     |      -     |
+|    PTA12   |      D/C     |      -     |
+|    PTA9    |      SCK     |      -     |
+|    PTA8    |     MOSI     |      -     |
+|    PTB3    |       -      |     SCL    |
+|    PTB4    |       -      |     SDA    |
 
 # Baseline firmware for the [Warp](https://github.com/physical-computation/Warp-hardware) family of hardware platforms
 This is the firmware for the [Warp hardware](https://github.com/physical-computation/Warp-hardware) and its publicly available and unpublished derivatives. This firmware also runs on the Freescale/NXP FRDM KL03 evaluation board which we use for teaching at the University of Cambridge. When running on platforms other than Warp, only the sensors available in the corresponding hardware platform are accessible.
